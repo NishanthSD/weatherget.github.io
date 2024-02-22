@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    <style>
+        *{
+            font-family:"JetBrains Mono";
+            background-color: #252525;
+            color:#f0f0f0
+        }
+        input{
+            width:20vw;
+            height: 4vh;
+            border: none;
+            background-color: #003030;
+            border-radius: 1vh;
+            padding: 0.5vh;
+        }
+        input:hover{
+            box-shadow: 0 0 1vh #003030;
+        }
+        img {
+            width: 50px; /* Adjust the width as needed */
+            height: 50px; /* Adjust the height as needed */
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #ffffff;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+            margin-top: 20px;
+            display: none; /* Hide spinner by default */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        img{
+            width:15vw;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weather Get</h1>
+    <input type="text" id="cityInput" placeholder="city" onkeydown="handleKeyDown(event)"><br>
+    <br><br>
+    <div id="erer" class="spinner"></div> <!-- Ensure spinner is placed correctly -->
+    <div id="weatherDisplay">
+    </div>
+    <script>
+        function handleKeyDown(event) {
+            if(event.key === 'Enter') {
+                const city = document.getElementById('cityInput').value;
+                fetchWeather(city);
+            }
+        }
+
+        async function fetchWeather(city) {
+            const spinner = document.querySelector('#erer');
+            spinner.style.display = 'block'; // Show spinner while loading data
+
+            const apiKey = '919fbfc4f39c4394bb274443242202'; // Replace 'YOUR_API_KEY' with your actual API key
+            const apiUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`;
+            
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                displayWeather(data);
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+            } finally {
+             // Hide spinner when data is loaded or on error
+            }
+            spinner.style.display = 'none';
+        }
+
+        function displayWeather(data) {
+            const weatherDisplay = document.getElementById('weatherDisplay');
+            weatherDisplay.style.display="block";
+            weatherDisplay.innerHTML = `
+                <h2>${data.location.name}, ${data.location.country}, (${data.location.lat},${data.location.lon})</h2>
+                <img height='300%' src="${data.current.condition.icon}" alt="Weather Icon">
+                <p>${data.current.condition.text}</p>
+                <p>${data.current.temp_c}°C, ${data.current.temp_f}°F</p>
+            `;
+        }
+    </script>
+</body>
+</html>
